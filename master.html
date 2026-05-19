@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="robots" content="noindex">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #000; overflow: hidden; }
+    iframe {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      border: none;
+      z-index: 1;
+    }
+    #overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #000;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    #play-btn {
+      width: 80px;
+      height: 80px;
+      background: rgba(255,255,255,0.15);
+      border: 2px solid white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #play-btn::after {
+      content: '';
+      border-left: 30px solid white;
+      border-top: 18px solid transparent;
+      border-bottom: 18px solid transparent;
+      margin-left: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <iframe id="videoFrame" allow="autoplay; fullscreen" allowfullscreen></iframe>
+
+  <div id="overlay" onclick="startVideo()">
+    <div id="play-btn"></div>
+  </div>
+
+  <script>
+    // Récupère l'ID vidéo depuis l'URL
+    const params = new URLSearchParams(window.location.search);
+    const videoId = params.get('v');
+
+    if (videoId) {
+      document.getElementById('videoFrame').src =
+        'https://drive.google.com/file/d/' + videoId + '/preview?rm=minimal';
+    }
+
+    function isWebView() {
+      var ua = navigator.userAgent;
+      return (
+        ua.includes('FBAN') || ua.includes('FBAV') ||
+        ua.includes('Instagram') || ua.includes('WhatsApp') ||
+        ua.includes('Line') || ua.includes('Snapchat') ||
+        (ua.includes('Android') && ua.includes('wv'))
+      );
+    }
+
+    if (isWebView()) {
+      if (/Android/i.test(navigator.userAgent)) {
+        window.location = 'intent://' + location.host + location.pathname + location.search + '#Intent;scheme=https;package=com.android.chrome;end';
+      } else if (/iPhone|iPad/i.test(navigator.userAgent)) {
+        window.location = 'x-safari-' + location.href;
+      }
+    }
+
+    function startVideo() {
+      document.getElementById('overlay').style.display = 'none';
+    }
+  </script>
+
+</body>
+</html>

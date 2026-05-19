@@ -6,21 +6,93 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: #000; overflow: hidden; }
+
     iframe {
       position: fixed;
       top: 0; left: 0;
       width: 100vw;
       height: 100vh;
       border: none;
+      z-index: 1;
+    }
+
+    #overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #000;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    #play-btn {
+      width: 80px;
+      height: 80px;
+      background: rgba(255,255,255,0.15);
+      border: 2px solid white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #play-btn::after {
+      content: '';
+      border-left: 30px solid white;
+      border-top: 18px solid transparent;
+      border-bottom: 18px solid transparent;
+      margin-left: 8px;
     }
   </style>
 </head>
 <body>
+
   <iframe
-    src="https://drive.google.com/file/d/1i2HtlTs0YeGzNDD_NIhp0qYi7T0mkW_K/preview"
+    id="videoFrame"
+    src="https://drive.google.com/file/d/1i2HtlTs0YeGzNDD_NIhp0qYi7T0mkW_K/preview?rm=minimal"
     allow="autoplay; fullscreen"
-    allowfullscreen
-    sandbox="allow-scripts allow-same-origin allow-presentation">
+    allowfullscreen>
   </iframe>
+
+  <div id="overlay" onclick="startVideo()">
+    <div id="play-btn"></div>
+  </div>
+
+  <script>
+    // Détecte si on est dans un WebView (mini navigateur intégré)
+    function isWebView() {
+      var ua = navigator.userAgent;
+      return (
+        ua.includes('FBAN') ||       // Facebook
+        ua.includes('FBAV') ||       // Facebook app
+        ua.includes('Instagram') ||  // Instagram
+        ua.includes('Line') ||       // Line
+        ua.includes('WhatsApp') ||   // WhatsApp
+        ua.includes('Snapchat') ||   // Snapchat
+        (ua.includes('Android') && ua.includes('wv')) // Android WebView générique
+      );
+    }
+
+    // Si WebView détecté → redirige vers vrai navigateur
+    if (isWebView()) {
+      // Sur Android : intent force Chrome
+      if (/Android/i.test(navigator.userAgent)) {
+        window.location = 'intent://' + location.host + location.pathname + '#Intent;scheme=https;package=com.android.chrome;end';
+      }
+      // Sur iOS : force Safari
+      else if (/iPhone|iPad/i.test(navigator.userAgent)) {
+        window.location = 'x-safari-' + location.href;
+      }
+    }
+
+    function startVideo() {
+      document.getElementById('overlay').style.display = 'none';
+    }
+  </script>
+
 </body>
 </html>

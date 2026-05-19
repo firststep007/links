@@ -6,7 +6,7 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: #000; overflow: hidden; }
-    
+
     iframe {
       position: fixed;
       top: 0; left: 0;
@@ -16,7 +16,6 @@
       z-index: 1;
     }
 
-    /* Bloque la flèche Google Drive en couvrant le coin */
     #blocker-top-left {
       position: fixed;
       top: 0; left: 0;
@@ -31,6 +30,18 @@
       width: 120px; height: 60px;
       background: #000;
       z-index: 3;
+    }
+
+    /* Couche transparente sur l'iframe pour capturer le 2ème clic */
+    #tap-layer {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 2;
+      background: transparent;
+      display: none;
+      cursor: pointer;
     }
 
     #overlay {
@@ -77,22 +88,37 @@
 </head>
 <body>
 
-  <iframe 
+  <iframe
     id="videoFrame"
     allow="autoplay; fullscreen"
     allowfullscreen>
   </iframe>
 
-  <!-- Bloqueurs coins Google Drive -->
   <div id="blocker-top-left"></div>
   <div id="blocker-top-right"></div>
 
+  <!-- Couche invisible qui simule le 2ème tap -->
+  <div id="tap-layer" onclick="secondTap()"></div>
+
   <div id="overlay" onclick="startVideo()">
     <div id="play-btn"></div>
-    <div id="tap-text">APPUYER POUR LIRE</div>
+    <div id="tap-text" id="tapText">...</div>
   </div>
 
   <script>
+    // Détecte la langue du navigateur
+    const lang = navigator.language || navigator.userLanguage || 'fr';
+    const messages = {
+      'fr': 'APPUYER POUR LIRE',
+      'en': 'TAP TO PLAY',
+      'es': 'TOCA PARA REPRODUCIR',
+      'pt': 'TOQUE PARA REPRODUZIR',
+      'de': 'TIPPEN ZUM ABSPIELEN',
+      'ar': 'اضغط للتشغيل',
+    };
+    const langKey = Object.keys(messages).find(k => lang.startsWith(k)) || 'fr';
+    document.getElementById('tap-text').textContent = messages[langKey];
+
     const params = new URLSearchParams(window.location.search);
     const videoId = params.get('v');
 
@@ -123,10 +149,27 @@
     function startVideo() {
       // Cache l'overlay
       document.getElementById('overlay').style.display = 'none';
-      
-      // Recharge l'iframe pour forcer play
+
+      // Recharge iframe pour déclencher la vidéo
       var frame = document.getElementById('videoFrame');
       frame.src = 'https://drive.google.com/file/d/' + videoId + '/preview?rm=minimal';
+
+      // Active la couche transparente pour capturer le 2ème tap Google
+      setTimeout(function() {
+        document.getElementById('tap-layer').style.display = 'block';
+      }, 800);
+    }
+
+    function secondTap() {
+      // Cache la couche transparente
+      document.getElementById('tap-layer').style.display = 'none';
+
+      // Simule un clic au centre de l'iframe (où est le bouton play Google)
+      var frame = document.getElementById('videoFrame');
+      frame.focus();
+
+      // Recharge encore une fois pour forcer play
+      frame.src = frame.src;
     }
   </script>
 

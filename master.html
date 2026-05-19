@@ -27,21 +27,17 @@
     #blocker-top-right {
       position: fixed;
       top: 0; right: 0;
-      width: 120px; height: 60px;
+      width: 180px; height: 60px;
       background: #000;
       z-index: 3;
     }
 
-    /* Couche transparente sur l'iframe pour capturer le 2ème clic */
-    #tap-layer {
+    #blocker-bottom {
       position: fixed;
-      top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
-      z-index: 2;
-      background: transparent;
-      display: none;
-      cursor: pointer;
+      bottom: 0; left: 0;
+      width: 100vw; height: 50px;
+      background: #000;
+      z-index: 3;
     }
 
     #overlay {
@@ -96,18 +92,16 @@
 
   <div id="blocker-top-left"></div>
   <div id="blocker-top-right"></div>
-
-  <!-- Couche invisible qui simule le 2ème tap -->
-  <div id="tap-layer" onclick="secondTap()"></div>
+  <div id="blocker-bottom"></div>
 
   <div id="overlay" onclick="startVideo()">
     <div id="play-btn"></div>
-    <div id="tap-text" id="tapText">...</div>
+    <div id="tap-text">...</div>
   </div>
 
   <script>
-    // Détecte la langue du navigateur
-    const lang = navigator.language || navigator.userLanguage || 'fr';
+    // Langue automatique
+    const lang = navigator.language || 'fr';
     const messages = {
       'fr': 'APPUYER POUR LIRE',
       'en': 'TAP TO PLAY',
@@ -119,6 +113,7 @@
     const langKey = Object.keys(messages).find(k => lang.startsWith(k)) || 'fr';
     document.getElementById('tap-text').textContent = messages[langKey];
 
+    // Charge la vidéo EN ARRIÈRE-PLAN dès le début
     const params = new URLSearchParams(window.location.search);
     const videoId = params.get('v');
 
@@ -147,29 +142,9 @@
     }
 
     function startVideo() {
-      // Cache l'overlay
-      document.getElementById('overlay').style.display = 'none';
-
-      // Recharge iframe pour déclencher la vidéo
-      var frame = document.getElementById('videoFrame');
-      frame.src = 'https://drive.google.com/file/d/' + videoId + '/preview?rm=minimal';
-
-      // Active la couche transparente pour capturer le 2ème tap Google
-      setTimeout(function() {
-        document.getElementById('tap-layer').style.display = 'block';
-      }, 800);
-    }
-
-    function secondTap() {
-      // Cache la couche transparente
-      document.getElementById('tap-layer').style.display = 'none';
-
-      // Simule un clic au centre de l'iframe (où est le bouton play Google)
-      var frame = document.getElementById('videoFrame');
-      frame.focus();
-
-      // Recharge encore une fois pour forcer play
-      frame.src = frame.src;
+      // Supprime juste l'overlay — Google Drive joue déjà en arrière-plan
+      document.getElementById('overlay').remove();
+      // NE PAS recharger l'iframe = pas de 2ème bouton play
     }
   </script>
 

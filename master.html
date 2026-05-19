@@ -6,6 +6,7 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: #000; overflow: hidden; }
+    
     iframe {
       position: fixed;
       top: 0; left: 0;
@@ -14,18 +15,38 @@
       border: none;
       z-index: 1;
     }
+
+    /* Bloque la flèche Google Drive en couvrant le coin */
+    #blocker-top-left {
+      position: fixed;
+      top: 0; left: 0;
+      width: 60px; height: 60px;
+      background: #000;
+      z-index: 3;
+    }
+
+    #blocker-top-right {
+      position: fixed;
+      top: 0; right: 0;
+      width: 120px; height: 60px;
+      background: #000;
+      z-index: 3;
+    }
+
     #overlay {
       position: fixed;
       top: 0; left: 0;
       width: 100vw;
       height: 100vh;
       background: #000;
-      z-index: 2;
+      z-index: 4;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       cursor: pointer;
     }
+
     #play-btn {
       width: 80px;
       height: 80px;
@@ -36,6 +57,7 @@
       align-items: center;
       justify-content: center;
     }
+
     #play-btn::after {
       content: '';
       border-left: 30px solid white;
@@ -43,18 +65,34 @@
       border-bottom: 18px solid transparent;
       margin-left: 8px;
     }
+
+    #tap-text {
+      color: rgba(255,255,255,0.5);
+      font-family: sans-serif;
+      font-size: 13px;
+      margin-top: 16px;
+      letter-spacing: 1px;
+    }
   </style>
 </head>
 <body>
 
-  <iframe id="videoFrame" allow="autoplay; fullscreen" allowfullscreen></iframe>
+  <iframe 
+    id="videoFrame"
+    allow="autoplay; fullscreen"
+    allowfullscreen>
+  </iframe>
+
+  <!-- Bloqueurs coins Google Drive -->
+  <div id="blocker-top-left"></div>
+  <div id="blocker-top-right"></div>
 
   <div id="overlay" onclick="startVideo()">
     <div id="play-btn"></div>
+    <div id="tap-text">APPUYER POUR LIRE</div>
   </div>
 
   <script>
-    // Récupère l'ID vidéo depuis l'URL
     const params = new URLSearchParams(window.location.search);
     const videoId = params.get('v');
 
@@ -63,6 +101,7 @@
         'https://drive.google.com/file/d/' + videoId + '/preview?rm=minimal';
     }
 
+    // Détecte WebView
     function isWebView() {
       var ua = navigator.userAgent;
       return (
@@ -82,7 +121,12 @@
     }
 
     function startVideo() {
+      // Cache l'overlay
       document.getElementById('overlay').style.display = 'none';
+      
+      // Recharge l'iframe pour forcer play
+      var frame = document.getElementById('videoFrame');
+      frame.src = 'https://drive.google.com/file/d/' + videoId + '/preview?rm=minimal';
     }
   </script>
 

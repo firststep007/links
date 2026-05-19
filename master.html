@@ -16,26 +16,10 @@
       z-index: 1;
     }
 
-    #blocker-top-left {
-      position: fixed;
-      top: 0; left: 0;
-      width: 60px; height: 60px;
-      background: #000;
-      z-index: 3;
-    }
-
-    #blocker-top-right {
+    #blocker-right {
       position: fixed;
       top: 0; right: 0;
-      width: 180px; height: 60px;
-      background: #000;
-      z-index: 3;
-    }
-
-    #blocker-bottom {
-      position: fixed;
-      bottom: 0; left: 0;
-      width: 100vw; height: 50px;
+      width: 300px; height: 100vh;
       background: #000;
       z-index: 3;
     }
@@ -90,9 +74,7 @@
     allowfullscreen>
   </iframe>
 
-  <div id="blocker-top-left"></div>
-  <div id="blocker-top-right"></div>
-  <div id="blocker-bottom"></div>
+  <div id="blocker-right"></div>
 
   <div id="overlay" onclick="startVideo()">
     <div id="play-btn"></div>
@@ -100,7 +82,6 @@
   </div>
 
   <script>
-    // Langue automatique
     const lang = navigator.language || 'fr';
     const messages = {
       'fr': 'APPUYER POUR LIRE',
@@ -113,7 +94,6 @@
     const langKey = Object.keys(messages).find(k => lang.startsWith(k)) || 'fr';
     document.getElementById('tap-text').textContent = messages[langKey];
 
-    // Charge la vidéo EN ARRIÈRE-PLAN dès le début
     const params = new URLSearchParams(window.location.search);
     const videoId = params.get('v');
 
@@ -122,7 +102,6 @@
         'https://drive.google.com/file/d/' + videoId + '/preview?rm=minimal';
     }
 
-    // Détecte WebView
     function isWebView() {
       var ua = navigator.userAgent;
       return (
@@ -142,9 +121,7 @@
     }
 
     function startVideo() {
-      // Supprime juste l'overlay — Google Drive joue déjà en arrière-plan
       document.getElementById('overlay').remove();
-      // NE PAS recharger l'iframe = pas de 2ème bouton play
     }
   </script>
 
